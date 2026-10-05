@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alcohol · 文档 · 一只猫</title>
+  <meta name="description" content="Alcohol 自定义物品与装备效果管理插件的使用说明。">
+
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('theme');
+        var theme = saved || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {}
+    })();
+  </script>
+
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/docs.css">
+  <link rel="icon" type="image/jpeg" href="../assets/head.jpg">
+</head>
+<body>
+
+  <header class="site-nav" id="siteNav">
+    <div class="nav-inner">
+      <a class="brand" href="../index.html">一只猫</a>
+      <nav class="nav-links">
+        <a href="../index.html">首页</a>
+        <a href="../projects.html">项目</a>
+        <a href="../docs.html" class="is-active">文档</a>
+        <a href="../share.html">分享</a>
+        <a href="../guestbook.html">留言</a>
+      </nav>
+      <button class="theme-toggle" type="button" aria-label="切换深浅色主题">
+        <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+
+    <!-- ============ 左侧边栏 ============ -->
+    <aside class="docs-sidebar" id="docsSidebar">
+      <button class="sidebar-toggle" type="button" aria-label="切换侧边栏">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M3 6h18M3 12h18M3 18h18"/>
+        </svg>
+        <span>目录</span>
+      </button>
+
+      <a class="sidebar-back" href="../docs.html">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        全部插件
+      </a>
+
+      <nav class="sidebar-nav">
+        <div class="sidebar-group">
+          <span class="sidebar-group-title">Alcohol</span>
+          <a class="sidebar-link" href="#intro">
+            <span class="sidebar-link-icon">📖</span> 简介
+          </a>
+          <a class="sidebar-link" href="#install">
+            <span class="sidebar-link-icon">📦</span> 安装
+          </a>
+          <a class="sidebar-link" href="#config">
+            <span class="sidebar-link-icon">⚙️</span> 配置
+          </a>
+          <a class="sidebar-link" href="#commands">
+            <span class="sidebar-link-icon">⌨️</span> 命令
+          </a>
+          <a class="sidebar-link" href="#faq">
+            <span class="sidebar-link-icon">❓</span> 常见问题
+          </a>
+        </div>
+
+        <div class="sidebar-group">
+          <span class="sidebar-group-title">其他插件</span>
+          <a class="sidebar-link" href="nationalday.html">
+            <span class="sidebar-link-icon">🎉</span> NationalDay
+          </a>
+          <a class="sidebar-link" href="mooncake.html">
+            <span class="sidebar-link-icon">🥮</span> MoonCake
+          </a>
+          <a class="sidebar-link" href="redpacket.html">
+            <span class="sidebar-link-icon">🧧</span> RedPacket2
+          </a>
+          <a class="sidebar-link" href="xcreeper.html">
+            <span class="sidebar-link-icon">💚</span> XCreeper
+          </a>
+          <a class="sidebar-link" href="safeworld.html">
+            <span class="sidebar-link-icon">🛡️</span> SafeWorld
+          </a>
+          <a class="sidebar-link" href="betterfoods.html">
+            <span class="sidebar-link-icon">🍎</span> A Better Foods
+          </a>
+        </div>
+      </nav>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ============ 主内容区 ============ -->
+    <main class="docs-content">
+      <div class="docs-inner">
+
+        <!-- ============ 插件头部 ============ -->
+        <section class="plugin-hero">
+          <div class="plugin-hero-top">
+            <div class="plugin-hero-icon">🍺</div>
+            <div class="plugin-hero-info">
+              <h1 class="plugin-hero-title">Alcohol</h1>
+              <p class="plugin-hero-desc">强大的自定义物品、配方和装备效果管理系统，可用于 RPG 定义武器装备。</p>
+            </div>
+          </div>
+
+          <div class="plugin-hero-badges">
+            <span class="badge badge-accent">v1.0.0</span>
+            <span class="badge badge-green">Paper / Spigot</span>
+            <span class="badge badge-orange">Java 17+</span>
+            <span class="badge badge-gray">免费</span>
+          </div>
+
+          <div class="plugin-hero-actions">
+            <a class="btn btn-primary" href="https://www.minebbs.com/resources/alcohol.18453/" target="_blank" rel="noopener">
+              下载插件
+            </a>
+            <a class="btn btn-ghost" href="https://www.minebbs.com/resources/alcohol.18453/" target="_blank" rel="noopener">
+              MineBBS 页面
+            </a>
+          </div>
+        </section>
+
+        <!-- ============ 简介 ============ -->
+        <section class="doc-section" id="intro">
+          <h2>简介</h2>
+          <p class="doc-lead">
+            Alcohol 为服务器添加了完整的自定义物品系统。
+            你可以用它定义新的饮品、食物、装备，给它们加上特殊效果，
+            甚至搭一整套 RPG 装备体系。
+          </p>
+
+          <div class="feature-grid">
+            <div class="feature-card">
+              <div class="feature-icon">🎨</div>
+              <div class="feature-title">自定义物品</div>
+              <div class="feature-text">用配置文件定义物品名称、材质、描述和附魔。</div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">⚗️</div>
+              <div class="feature-title">自定义配方</div>
+              <div class="feature-text">支持工作台、熔炉、酿造台等多种合成方式。</div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">✨</div>
+              <div class="feature-title">装备效果</div>
+              <div class="feature-text">穿戴时触发药水效果、属性加成或自定义逻辑。</div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">🔄</div>
+              <div class="feature-title">热重载</div>
+              <div class="feature-text">改完配置执行命令即可生效，无需重启服务端。</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ 安装 ============ -->
+        <section class="doc-section" id="install">
+          <h2>安装</h2>
+
+          <div class="info-row">
+            <div class="info-item">
+              <div class="info-label">服务端</div>
+              <div class="info-value">Paper / Spigot</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Java</div>
+              <div class="info-value">17 或更高</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Minecraft</div>
+              <div class="info-value">1.20.4+</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">前置</div>
+              <div class="info-value">无</div>
+            </div>
+          </div>
+
+          <h3>安装步骤</h3>
+          <ol class="doc-steps">
+            <li>
+              <strong>下载插件</strong>
+              <span>从 <a href="https://www.minebbs.com/resources/alcohol.18453/" target="_blank" rel="noopener">MineBBS</a> 下载最新的 <code>.jar</code> 文件。</span>
+            </li>
+            <li>
+              <strong>放入插件目录</strong>
+              <span>把 jar 文件复制到服务器的 <code>plugins/</code> 文件夹。</span>
+            </li>
+            <li>
+              <strong>重启服务端</strong>
+              <span>插件会自动生成默认配置文件。</span>
+            </li>
+            <li>
+              <strong>修改配置</strong>
+              <span>编辑 <code>plugins/Alcohol/config.yml</code>，按需调整。</span>
+            </li>
+            <li>
+              <strong>重载生效</strong>
+              <span>执行 <code>/alcohol reload</code> 让配置立即生效。</span>
+            </li>
+          </ol>
+        </section>
+
+        <!-- ============ 配置 ============ -->
+        <section class="doc-section" id="config">
+          <h2>配置</h2>
+          <p>配置文件位于 <code>plugins/Alcohol/config.yml</code>。下面是常见的配置项：</p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-lang">yaml</span>
+              <button class="code-copy" type="button">复制</button>
+            </div>
+            <pre><code># 自定义物品
+items:
+  enabled: true              # 是否启用自定义物品
+  directory: items/          # 物品定义文件目录
+
+# 自定义配方
+recipes:
+  enabled: true
+  directory: recipes/
+
+# 装备效果
+equipment:
+  # 穿戴时是否播放粒子效果
+  particles: true
+  # 生效延迟（刻）
+  effect-delay: 20
+
+# 调试模式
+debug: false</code></pre>
+          </div>
+
+          <h3>配置项说明</h3>
+          <table class="doc-table">
+            <thead>
+              <tr><th>字段</th><th>默认值</th><th>说明</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>items.enabled</code></td>
+                <td><code>true</code></td>
+                <td>是否启用自定义物品系统</td>
+              </tr>
+              <tr>
+                <td><code>items.directory</code></td>
+                <td><code>items/</code></td>
+                <td>物品定义文件存放目录</td>
+              </tr>
+              <tr>
+                <td><code>recipes.enabled</code></td>
+                <td><code>true</code></td>
+                <td>是否启用自定义配方系统</td>
+              </tr>
+              <tr>
+                <td><code>equipment.particles</code></td>
+                <td><code>true</code></td>
+                <td>穿戴装备时是否播放粒子效果</td>
+              </tr>
+              <tr>
+                <td><code>debug</code></td>
+                <td><code>false</code></td>
+                <td>调试模式，开启后控制台输出更详细日志</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-body">
+              <strong>提示</strong>
+              <p>物品和配方定义文件的格式请参考插件附带的示例文件。修改后需要执行重载命令才能生效。</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ 命令 ============ -->
+        <section class="doc-section" id="commands">
+          <h2>命令</h2>
+          <p>主命令为 <code>/alcohol</code>，别名 <code>/alc</code>。</p>
+
+          <div class="command-list">
+            <div class="command-item">
+              <span class="command-code">/alcohol help</span>
+              <span class="command-desc">查看插件帮助</span>
+            </div>
+            <div class="command-item">
+              <span class="command-code">/alcohol reload</span>
+              <span class="command-desc">重载配置文件</span>
+              <span class="command-perm">alcohol.admin</span>
+            </div>
+            <div class="command-item">
+              <span class="command-code">/alcohol give &lt;物品&gt;</span>
+              <span class="command-desc">给自己一个自定义物品</span>
+              <span class="command-perm">alcohol.give</span>
+            </div>
+            <div class="command-item">
+              <span class="command-code">/alcohol list</span>
+              <span class="command-desc">列出所有自定义物品</span>
+            </div>
+            <div class="command-item">
+              <span class="command-code">/alcohol info &lt;物品&gt;</span>
+              <span class="command-desc">查看某个物品的详细信息</span>
+            </div>
+          </div>
+
+          <h3>使用示例</h3>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-lang">text</span>
+              <button class="code-copy" type="button">复制</button>
+            </div>
+            <pre><code>/alcohol list                 # 查看所有物品
+/alcohol info magic_sword     # 查看魔法剑信息
+/alcohol give magic_sword     # 给自己一把魔法剑
+/alcohol reload               # 重载配置</code></pre>
+          </div>
+        </section>
+
+        <!-- ============ 常见问题 ============ -->
+        <section class="doc-section" id="faq">
+          <h2>常见问题</h2>
+
+          <h3>插件加载失败怎么办？</h3>
+          <p>
+            先检查 Java 版本是否 ≥ 17，服务端是否为 Paper 或 Spigot 1.20.4+。
+            然后查看控制台完整报错日志，通常会指出具体原因。
+          </p>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-body">
+              <strong>版本不匹配</strong>
+              <p>如果你的服务端是 1.19 或更低版本，插件可能无法正常工作。请升级服务端或使用旧版本插件。</p>
+            </div>
+          </div>
+
+          <h3>自定义物品不生效？</h3>
+          <p>
+            确认物品定义文件放在正确的目录下，YAML 格式没有缩进错误。
+            修改后执行 <code>/alcohol reload</code>，如果仍然无效，重启服务端试试。
+          </p>
+
+          <h3>如何获取更多物品定义示例？</h3>
+          <p>
+            插件压缩包里通常会附带 <code>examples/</code> 文件夹，
+            里面有一些现成的配置样例，可以直接复制到你的配置目录中使用。
+          </p>
+        </section>
+
+        <!-- ============ 上一篇 / 下一篇 ============ -->
+        <nav class="doc-pager">
+          <a class="doc-pager-prev" href="../docs.html">
+            <span class="pager-label">← 返回</span>
+            <span class="pager-title">全部插件</span>
+          </a>
+          <a class="doc-pager-next" href="nationalday.html">
+            <span class="pager-label">下一篇 →</span>
+            <span class="pager-title">NationalDay</span>
+          </a>
+        </nav>
+
+      </div>
+    </main>
+
+    <!-- ============ 右侧目录 ============ -->
+    <aside class="docs-toc" id="docsToc">
+      <span class="toc-title">本页目录</span>
+      <ul class="toc-list" id="tocList"></ul>
+    </aside>
+
+  </div>
+
+  <footer class="site-footer">
+    <p>© <span id="year"></span> 一只猫 ·
+      <a href="https://github.com/xiaomian124" target="_blank" rel="noopener">github.com/xiaomian124</a>
+    </p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+  <script src="../js/docs.js"></script>
+</body>
+</html>
