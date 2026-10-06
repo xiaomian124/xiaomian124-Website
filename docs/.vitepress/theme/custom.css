@@ -1,0 +1,196 @@
+/* =========================================================
+   首页最外层容器：限制宽度并居中
+   ========================================================= */
+.home-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* =========================================================
+   首页 Hero
+   ========================================================= */
+.home-hero {
+  padding: 64px 0 48px;
+  text-align: center;
+}
+
+.home-hero-name {
+  font-size: 42px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin: 0 0 12px;
+  background: linear-gradient(
+    120deg,
+    var(--vp-c-brand-1) 30%,
+    var(--vp-c-brand-2)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.home-hero-text {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 0 0 10px;
+  color: var(--vp-c-text-1);
+}
+
+.home-hero-tagline {
+  font-size: 16px;
+  color: var(--vp-c-text-2);
+  margin: 0 0 32px;
+}
+
+.home-hero-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.home-hero-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 22px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 20px;
+  text-decoration: none;
+  transition: background-color .25s ease, color .25s ease;
+}
+
+.home-hero-btn.is-brand {
+  color: var(--vp-button-brand-text);
+  background: var(--vp-button-brand-bg);
+}
+.home-hero-btn.is-brand:hover {
+  background: var(--vp-button-brand-hover-bg);
+}
+
+.home-hero-btn.is-alt {
+  color: var(--vp-button-alt-text);
+  background: var(--vp-button-alt-bg);
+}
+.home-hero-btn.is-alt:hover {
+  background: var(--vp-button-alt-hover-bg);
+}
+
+/* =========================================================
+   首页区块标题
+   ========================================================= */
+.home-section-title {
+  margin: 48px 0 20px;
+  padding-bottom: 12px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--vp-c-text-1);
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+
+/* =========================================================
+   首页卡片网格
+   ========================================================= */
+.home-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.home-card {
+  display: block;
+  padding: 20px;
+  background: var(--vp-c-bg-soft);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 12px;
+  text-decoration: none;
+  transition: border-color .25s ease, transform .25s ease;
+}
+
+.home-card:hover {
+  border-color: var(--vp-c-brand-1);
+  transform: translateY(-2px);
+}
+
+.home-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.home-card-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  filter: brightness(0);
+}
+
+html.dark .home-card-icon {
+  filter: brightness(0) invert(1);
+}
+
+.home-card-title {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--vp-c-text-1);
+  transition: color .25s ease;
+}
+
+.home-card:hover .home-card-title {
+  color: var(--vp-c-brand-1);
+}
+
+.home-card-details {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--vp-c-text-2);
+}
+
+/* =========================================================
+   让 VitePress 的 page 布局给首页内容更多宽度
+   ========================================================= */
+.VPDoc .content-container {
+  max-width: 100% !important;
+}
+
+.VPDoc .main {
+  max-width: 100% !important;
+}
+
+/* =========================================================
+   响应式
+   ========================================================= */
+@media (max-width: 640px) {
+  .home-page {
+    padding: 0 16px;
+  }
+  .home-hero {
+    padding: 40px 0 32px;
+  }
+  .home-hero-name {
+    font-size: 30px;
+  }
+  .home-hero-text {
+    font-size: 19px;
+  }
+  .home-hero-tagline {
+    font-size: 14px;
+  }
+  .home-card-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .home-section-title {
+    margin: 36px 0 16px;
+    font-size: 19px;
+  }
+}
