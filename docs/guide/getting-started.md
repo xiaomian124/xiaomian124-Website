@@ -6,11 +6,29 @@
 
 在安装插件之前，确认你的服务器满足以下条件：
 
-| 项目 | 要求 |
+| 配置 | 要求 |
 |---|---|
 | 服务端 | Paper / Leaves / Spigot |
 | Java | 17 或更高版本 |
 | 内存 | 2GB 或以上 |
+
+**没有服务器核心？** 前往下载：
+
+| 核心 | 适用场景 | 下载地址 |
+|---|---|---|
+| **CraftBukkit** | 开发基线和极端兼容性实验 | [getbukkit.org](https://getbukkit.org/download/craftbukkit) |
+| **Spigot** | 技术向 / 生电服务器 | [getbukkit.org](https://getbukkit.org/download/spigot/) |
+| **Paper** | 纯净生存 / 插件服 | [papermc.io](https://papermc.io/) |
+| **Leaves** | 生电（红石技术） | [leavesmc.org](https://leavesmc.org/) |
+| **Leaf** | 性能极致追求的技术型服 | [leafmc.one](https://www.leafmc.one/zh) |
+| **NeoForge / Forge** | 大型整合包 / 大量模组 | [docs.neoforged.net](https://neoforged.net/) / [files.minecraftforge.net](https://files.minecraftforge.net/net/minecraftforge/forge/) |
+| **Fabric** | 轻量模组 / 性能向模组服 | [fabricmc.net](https://fabricmc.net/use/server/) |
+| **Velocity** | 多服务器群组代理 | [papermc.io](https://papermc.io/software/velocity/) |
+
+::: warning 提示
+建议使用开发活跃且社区资源较多的服务器核心，如 Paper 和 Leaf 等。  
+历史事件：[服务端那些事](https://bpd.skjsjhb.moe/docs/inter-1/) [开源死亡之日](https://haydenwu.org/posts/open-source-minecraft-bukkit-gpl/)
+:::
 
 ## 安装步骤
 
@@ -59,7 +77,7 @@
 
 ### 插件显示红色，加载失败？
 
-说明缺少前置插件或版本不匹配。查看控制台完整报错日志，通常会指出具体原因，并复制给 AI 检查问题，如果是插件本身问题，请在插件的 Issue 提供错误信息或复现问题。
+说明缺少前置插件或版本不匹配。查看控制台完整报错日志，通常会指出具体原因，可复制给 AI 检查问题，如果是插件本身问题，请在插件的 Issue 提供错误信息或复现问题。
 
 ### 重启后配置被重置？
 

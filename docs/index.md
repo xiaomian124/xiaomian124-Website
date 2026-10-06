@@ -5,11 +5,11 @@ layout: page
 <div class="home-page">
 
 <div class="home-hero">
-  <h1 class="home-hero-name">一只猫的插件文档</h1>
-  <p class="home-hero-text">Minecraft 插件与模组使用指南</p>
+  <h1 class="home-hero-name">一只猫的项目文档</h1>
+  <p class="home-hero-text">Minecraft 插件与模组和项目等使用文档</p>
   <p class="home-hero-tagline">安装、配置、命令，一站式文档</p>
   <div class="home-hero-actions">
-    <a class="home-hero-btn is-brand" href="/plugins/alcohol/">开始阅读</a>
+    <a class="home-hero-btn is-brand" href="/guide/index/">开始阅读</a>
     <a class="home-hero-btn is-alt" href="https://github.com/xiaomian124/xiaomian124-Website">GitHub</a>
   </div>
 </div>

@@ -1,103 +1,55 @@
 # Alcohol
 
-强大的自定义物品、配方和装备效果管理系统，可用于 RPG 定义武器装备。
+一个为 Minecraft Paper 服务器打造的综合酿酒与种植插件，添加了完整的酿酒产业链、多种自定义机器、丰富的酒类与特殊效果，以及配套的配方查看和物品管理系统。
+
+- **简介**
+- **[安装](./install)**
+- **[配置](./config)**
+- **[命令和权限](./commands)**
+- **[常见问题](./faq)**
+- **[玩法教程](./play)**
 
 ## 简介
 
-Alcohol 为服务器添加了完整的自定义物品系统。你可以用它定义新的饮品、食物、装备，给它们加上特殊效果，甚至搭一整套 RPG 装备体系。
+**Alcohol** 是一款功能丰富的 Paper 服务端插件，灵感来源于 *盛节精酿（Let's Do Brewery）* 与 *葡园酒香（Let's Do Vinery）*，为服务器带来从 **农作物种植 → 原料加工 → 酿造 → 陈酿 → 饮用** 的完整产业链。
 
-### 主要功能
+### 核心特色
 
-- 自定义物品名称、材质、描述和附魔
-- 支持工作台、熔炉、酿造台等多种合成方式
-- 穿戴时触发药水效果或属性加成
-- 配置文件热重载，无需重启服务端
+- **50+ 种酒与饮料**  
+  啤酒、威士忌、葡萄酒、陈酿酒、葡萄汁、苹果汁等，每种酒都有独特的外观、效果和酿造配方。
 
-## 安装
+- **完整的种植系统**  
+  玉米、樱桃、葡萄（含 8 种生物群系变种），支持自然生长、骨粉催熟、蜜蜂授粉，以及自定义掉落。
 
-### 环境要求
+- **多台自定义机器**  
+  烹饪锅、酿造炉、苹果压榨器、陈酿桶、葡萄藤盆、吧台音乐播放器，每台机器都有独立的 GUI 与进度机制。
 
-| 依赖 | 版本 |
-|---|---|
-| Paper / Spigot | 1.20.4+ |
-| Java | 17+ |
+- **酿造与陈酿机制**  
+  通过酿造炉产出酒液，再经陈酿桶提升品质。酿造过程包含气压管理、燃料消耗与品质降级机制。
 
-### 安装步骤
+- **丰富的饮酒效果**  
+  原版药水效果 + 自定义特殊效果（攀爬、水上行者、岩浆行者、猫娘、耄耋等），并配有冷却与提示。
 
-1. 从 [MineBBS](https://www.minebbs.com/resources/alcohol.18453/) 下载最新的 `.jar` 文件
-2. 把 jar 文件复制到服务器的 `plugins/` 文件夹
-3. 重启服务端，插件会自动生成默认配置文件
-4. 编辑 `plugins/Alcohol/config.yml`，按需调整
-5. 执行 `/alcohol reload` 让配置立即生效
+- **配方查看器与物品获取 GUI**  
+  通过 `/alcohol recipe` 查看所有机器的配方与合成方式，`/alcohol give` 快速获取插件物品。
+
+- **村民交易**  
+  农民村民会出售樱桃，不会影响原版交易内容。
+
+- **持久化支持**  
+  容器、植物、特殊效果、GUI 页码等数据在重启后自动恢复。
+
+## 版权与致谢
+
+本插件的玩法设计灵感来源于以下模组：
+
+- **盛节精酿（Let's Do Brewery）** —— 作者：[satisfyu](https://github.com/satisfyu)
+- **葡园酒香（Let's Do Vinery）** —— 作者：[satisfyu](https://github.com/satisfyu)
+
+本插件为**独立实现**，未使用原模组中采用 ARR 协议的任何资源文件。
+详细声明见 [NOTICE](https://github.com/xiaomian124/Alcohol/blob/main/NOTICE.md)。
 
 ::: tip 提示
-首次启动后，插件会生成 `config.yml`、`messages.yml` 和 `items/` 目录。
+本项目采用 **GNU General Public License v3.0** 协议开源。
+详见 [LICENSE](https://github.com/xiaomian124/Alcohol/blob/main/LICENSE.txt)。
 :::
-
-## 配置
-
-配置文件位于 `plugins/Alcohol/config.yml`。
-
-```yaml
-# 自定义物品
-items:
-  enabled: true
-  directory: items/
-
-# 自定义配方
-recipes:
-  enabled: true
-  directory: recipes/
-
-# 装备效果
-equipment:
-  particles: true
-  effect-delay: 20
-
-debug: false
-```
-
-### 配置项说明
-
-| 字段 | 默认值 | 说明 |
-|---|---|---|
-| `items.enabled` | `true` | 是否启用自定义物品系统 |
-| `items.directory` | `items/` | 物品定义文件存放目录 |
-| `recipes.enabled` | `true` | 是否启用自定义配方系统 |
-| `equipment.particles` | `true` | 穿戴装备时是否播放粒子效果 |
-| `debug` | `false` | 调试模式，开启后输出更详细日志 |
-
-## 命令
-
-主命令为 `/alcohol`，别名 `/alc`。
-
-| 命令 | 说明 | 权限 |
-|---|---|---|
-| `/alcohol help` | 查看插件帮助 | - |
-| `/alcohol reload` | 重载配置文件 | `alcohol.admin` |
-| `/alcohol give <物品>` | 给自己一个自定义物品 | `alcohol.give` |
-| `/alcohol list` | 列出所有自定义物品 | - |
-| `/alcohol info <物品>` | 查看某个物品的详细信息 | - |
-
-### 使用示例
-
-```
-/alcohol list                 # 查看所有物品
-/alcohol info magic_sword     # 查看魔法剑信息
-/alcohol give magic_sword     # 给自己一把魔法剑
-/alcohol reload               # 重载配置
-```
-
-## 常见问题
-
-### 插件加载失败怎么办？
-
-先检查 Java 版本是否 ≥ 17，服务端是否为 Paper 或 Spigot 1.20.4+。然后查看控制台完整报错日志。
-
-### 自定义物品不生效？
-
-确认物品定义文件放在正确的目录下，YAML 格式没有缩进错误。修改后执行 `/alcohol reload`，如果仍然无效，重启服务端试试。
-
-### 如何获取更多物品定义示例？
-
-插件压缩包里通常会附带 `examples/` 文件夹，里面有一些现成的配置样例，可以直接复制到你的配置目录中使用。

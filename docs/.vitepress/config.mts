@@ -3,8 +3,8 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   // ========== 站点基础信息 ==========
   lang: 'zh-CN',
-  title: '一只猫的插件文档',
-  description: 'Minecraft 插件与模组使用文档',
+  title: '一只猫的项目文档',
+  description: 'Minecraft 插件与模组和项目等使用文档',
   head: [
     ['link', { rel: 'icon', href: '/head.jpg' }]
   ],
@@ -15,9 +15,9 @@ export default defineConfig({
     nav: [
       { text: '首页', link: '/' },
       { text: '指南', link: '/guide/' },
-      { text: '插件', link: '/plugins/alcohol/' },
-      { text: '个人主页', link: 'https://xiaomian124-website.vjhcggifgfu.workers.dev/' },
-      { text: 'GitHub', link: 'https://github.com/xiaomian124' }
+      { text: '作者主页', link: '/home/' },
+      { text: 'GitHub', link: 'https://github.com/xiaomian124/xiaomian124-Website' },
+      { text: '赞助', link: 'https://ifdian.net/a/xiaomian124' }
     ],
 
     // ---------- 左侧边栏 ----------
@@ -67,7 +67,18 @@ export default defineConfig({
           text: '服务端插件',
           collapsed: false,
           items: [
-            { text: 'Alcohol', link: '/plugins/alcohol/' },
+            {
+              text: 'Alcohol',
+              collapsed: false,
+              items: [
+                { text: '简介', link: '/plugins/alcohol/' },
+                { text: '安装', link: '/plugins/alcohol/install' },
+                { text: '配置', link: '/plugins/alcohol/config' },
+                { text: '命令和权限', link: '/plugins/alcohol/commands' },
+                { text: '常见问题', link: '/plugins/alcohol/faq' },
+                { text: '玩法教程', link: '/plugins/alcohol/play' }
+              ]
+            },
             { text: 'MoonCake', link: '/plugins/mooncake/' },
             { text: 'NationalDay', link: '/plugins/nationalday/' },
             { text: 'RedPacket2', link: '/plugins/redpacket/' },
