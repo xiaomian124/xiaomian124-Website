@@ -15,7 +15,7 @@ export default defineConfig({
     nav: [
       { text: '首页', link: '/' },
       { text: '指南', link: '/guide/' },
-      { text: '作者主页', link: '/home/' },
+      { text: '作者主页', link: 'https://xiaomian124.top/' },
       { text: 'GitHub', link: 'https://github.com/xiaomian124/xiaomian124-Website' },
       { text: '赞助', link: 'https://ifdian.net/a/xiaomian124' }
     ],
