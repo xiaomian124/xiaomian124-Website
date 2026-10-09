@@ -16,7 +16,10 @@
     })();
   </script>
 
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css" id="mainCss">
+  <script>
+    document.getElementById('mainCss').href = 'css/style.css?v=' + Date.now();
+  </script>
   <link rel="stylesheet" href="css/docs.css">
   <link rel="icon" type="image/jpeg" href="assets/head.jpg">
 </head>
@@ -82,20 +85,20 @@
     <section class="panel">
       <div class="section-title">
         <span>精选文档</span>
-        <a class="more-link" href="docs.html">查看全部 »</a>
+        <a class="more-link" href="https://docs.xiaomian124.top/">查看全部 »</a>
       </div>
       <div class="card-grid">
-        <a class="card" href="https://xiaomian124.top/plugins/alcohol/">
+        <a class="card" href="https://docs.xiaomian124.top/plugins/alcohol/">
           <h3 class="card-title">🍺 Alcohol</h3>
           <p class="card-text">服务器酿酒插件</p>
           <span class="card-foot">插件 · Paper / Leaves</span>
         </a>
-        <a class="card" href="https://xiaomian124.top/plugins/mooncake/">
+        <a class="card" href="https://docs.xiaomian124.top/plugins/mooncake/">
           <h3 class="card-title">🥮 MoonCake</h3>
           <p class="card-text">中秋节主题插件</p>
           <span class="card-foot">插件 · Paper / Leaves</span>
         </a>
-        <a class="card" href="https://xiaomian124.top/plugins/safeworld/">
+        <a class="card" href="https://docs.xiaomian124.top/plugins/safeworld/">
           <h3 class="card-title">🛡️ SafeWorld</h3>
           <p class="card-text">创造服综合安全防护插件</p>
           <span class="card-foot">插件 · Paper / Leaves</span>
@@ -152,8 +155,14 @@
     </p>
   </footer>
 
-  <script src="js/main.js"></script>
-  <script src="js/github-repos.js"></script>
+  <script src="js/main.js" id="mainJs"></script>
+  <script>
+    document.getElementById('mainJs').src = 'js/main.js?v=' + Date.now();
+  </script>
+  <script src="js/github-repos.js" id="ghJs"></script>
+  <script>
+    document.getElementById('ghJs').src = 'js/github-repos.js?v=' + Date.now();
+  </script>
   <script>GitHubRepos.mount('#featuredRepos', 3);</script>
 </body>
 </html>
