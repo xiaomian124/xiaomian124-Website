@@ -606,35 +606,6 @@ body.theme-transition *::after {
 }
 
 /* =========================================================
-   10. Giscus 留言板
-   ========================================================= */
-.giscus-wrap {
-  padding: 24px 26px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
-}
-
-/* Giscus iframe 自动适应宽度 */
-.giscus,
-.giscus-frame {
-  width: 100%;
-  border: none;
-  color-scheme: auto;
-}
-
-/* 加载占位（Giscus 加载期间显示） */
-.giscus:empty::before {
-  content: '正在加载留言板…';
-  display: block;
-  padding: 40px 0;
-  text-align: center;
-  font-size: 14.5px;
-  color: var(--text-soft);
-}
-
-/* =========================================================
    11. 按钮
    ========================================================= */
 .btn {
@@ -751,13 +722,12 @@ body.theme-transition *::after {
 
   .form-row { grid-template-columns: 1fr; }
   .guest-form { padding: 20px 18px; }
-  .giscus-wrap { padding: 18px 16px; }
 
   .repo-updated { margin-left: 0; width: 100%; }
 }
 
 /* =========================================================
-   16. 尊重「减少动画」偏好
+   16. 减少动画
    ========================================================= */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -770,3 +740,161 @@ body.theme-transition *::after {
     transform: none !important;
   }
 }
+
+/* =========================================================
+   17. QQ 头像样式
+   ========================================================= */
+.note-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.note-avatar-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  object-fit: cover;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+}
+
+.note-head .note-avatar {
+  width: 32px;
+  height: 32px;
+  font-size: 14px;
+}
+
+.note-head .note-name {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 14.5px;
+}
+
+.note-head .note-time {
+  margin-left: auto;
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+
+/* ===== 留言板：头像和操作按钮 ===== */
+.note-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.note-avatar-img,
+.note-avatar-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.note-avatar-icon {
+  color: var(--text-dim);
+}
+
+.note-head .note-name {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 14.5px;
+}
+
+.note-head .note-time {
+  margin-left: auto;
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+
+.reply-quote {
+  margin: 0 0 10px;
+  padding: 8px 12px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text-soft);
+  background: var(--surface-2);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  display: flex;
+  gap: 8px;
+  overflow: hidden;
+}
+.reply-quote-name {
+  color: var(--accent);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.reply-quote-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 操作栏 */
+.note-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.note-action {
+  padding: 4px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--text-soft);
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: color .2s, border-color .2s, background .2s;
+}
+.note-action:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.note-action.is-active {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.note-delete:hover {
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+/* 回复提示条 */
+.reply-hint {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 8px 14px;
+  font-size: 13.5px;
+  color: var(--text-soft);
+  background: var(--accent-soft);
+  border-radius: 8px;
+}
+.reply-hint strong { color: var(--accent); }
+.reply-cancel {
+  margin-left: auto;
+  padding: 3px 10px;
+  font-size: 12.5px;
+  color: var(--text-soft);
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
+}
+.reply-cancel:hover { color: #ef4444; border-color: #ef4444; }

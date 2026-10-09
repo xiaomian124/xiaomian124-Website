@@ -4,8 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>留言 · 一只猫</title>
-  <meta name="description" content="留言。">
-
   <script>
     (function () {
       try {
@@ -15,7 +13,6 @@
       } catch (e) {}
     })();
   </script>
-
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" type="image/jpeg" href="assets/head.jpg">
 </head>
@@ -27,7 +24,7 @@
       <nav class="nav-links">
         <a href="index.html">首页</a>
         <a href="projects.html">项目</a>
-        <a href="/docs/">文档</a>
+        <a href="https://docs.xiaomian124.top/">文档</a>
         <a href="share.html">分享</a>
         <a href="guestbook.html" class="is-active">留言</a>
       </nav>
@@ -48,15 +45,42 @@
   <main class="container">
     <div class="page-head">
       <h1 class="page-title">留言板</h1>
-      <p class="page-sub">
-        插件建议、项目建议、报告 BUG 或者只是路过打个招呼，都欢迎。
-        留言会以 GitHub Discussion 的形式保存下来。
-      </p>
+      <p class="page-sub">插件建议、项目建议、报告 BUG 或者只是路过打个招呼，都欢迎。</p>
     </div>
 
     <section class="panel">
-      <div class="giscus-wrap">
-        <div class="giscus"></div>
+      <div class="section-title"><span>发表留言</span></div>
+
+      <form class="guest-form" id="commentForm">
+        <div class="reply-hint" id="replyHint" hidden>
+          正在回复 <strong class="reply-target-name"></strong>
+          <button type="button" class="reply-cancel" id="replyCancel">取消</button>
+        </div>
+
+        <div class="form-row">
+          <input class="form-input" type="text" id="nickname"
+                 placeholder="昵称（必填）" maxlength="20" required>
+          <input class="form-input" type="text" id="qq"
+                 placeholder="QQ 号（可选，用于头像）" maxlength="12">
+        </div>
+
+        <textarea class="form-textarea" id="content" rows="4"
+                  placeholder="想说的话（最多 500 字）" maxlength="500" required></textarea>
+
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit" id="submitBtn">提交留言</button>
+          <span class="form-hint" id="formHint"></span>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <span>全部留言</span>
+        <span class="plugin-count" id="commentCount"></span>
+      </div>
+      <div class="note-list" id="commentsList">
+        <p class="repo-loading">正在加载留言…</p>
       </div>
     </section>
   </main>
@@ -69,67 +93,222 @@
   </footer>
 
   <script src="js/main.js"></script>
-
-  <!-- ============ Giscus 留言板 ============ -->
-  <script src="https://giscus.app/client.js"
-          data-repo="xiaomian124/xiaomian124-Website"
-          data-repo-id="R_kgDOU7jcQQ"
-          data-category="公告"
-          data-category-id="DIC_kwDOU7jcQc4DHB0h"
-          data-mapping="pathname"
-          data-strict="0"
-          data-reactions-enabled="1"
-          data-emit-metadata="0"
-          data-input-position="top"
-          data-theme="dark"
-          data-lang="zh-CN"
-          data-loading="lazy"
-          crossorigin="anonymous"
-          async>
-  </script>
-
   <script>
-    /* =========================================================
-       Giscus 主题同步：跟随网站的深浅色切换
-       ========================================================= */
-    (function () {
-      const GISCUS_LIGHT = 'light';
-      const GISCUS_DARK  = 'dark';
+  (function () {
+    const API = 'https://guestbook.xiaomian124.top';
 
-      function currentGiscusTheme() {
-        return document.documentElement.getAttribute('data-theme') === 'dark'
-          ? GISCUS_DARK
-          : GISCUS_LIGHT;
+    const form = document.getElementById('commentForm');
+    const list = document.getElementById('commentsList');
+    const hint = document.getElementById('formHint');
+    const submitBtn = document.getElementById('submitBtn');
+    const countEl = document.getElementById('commentCount');
+    const replyHint = document.getElementById('replyHint');
+    const replyName = replyHint.querySelector('.reply-target-name');
+
+    let replyTo = null;
+
+    /* ---------- 工具 ---------- */
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function formatTime(iso) {
+      const date = new Date(iso.replace(' ', 'T') + 'Z');
+      const diff = (Date.now() - date) / 1000;
+      if (diff < 60) return '刚刚';
+      if (diff < 3600) return Math.floor(diff / 60) + ' 分钟前';
+      if (diff < 86400) return Math.floor(diff / 3600) + ' 小时前';
+      if (diff < 2592000) return Math.floor(diff / 86400) + ' 天前';
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    // 默认用户图标（无 QQ 时用）
+    const USER_ICON = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
+
+    function avatarHtml(qq) {
+      if (qq) {
+        return `<img class="note-avatar-img" src="https://q2.qlogo.cn/headimg_dl?dst_uin=${encodeURIComponent(qq)}&spec=100" alt="" onerror="this.outerHTML='<span class=&quot;note-avatar-icon&quot;>${USER_ICON}</span>'">`;
+      }
+      return `<span class="note-avatar-icon">${USER_ICON}</span>`;
+    }
+
+    /* ---------- 渲染 ---------- */
+    function renderComments(comments) {
+      if (!comments.length) {
+        list.innerHTML = '<p class="repo-empty">还没有留言，快来抢沙发吧！</p>';
+        countEl.textContent = '';
+        return;
+      }
+      countEl.textContent = `共 ${comments.length} 条`;
+
+      list.innerHTML = comments.map(c => {
+        const upActive = c.my_vote === 1 ? ' is-active' : '';
+        const downActive = c.my_vote === -1 ? ' is-active' : '';
+
+        const replyBlock = c.reply_nickname
+          ? `<div class="reply-quote">
+               <span class="reply-quote-name">@${escapeHtml(c.reply_nickname)}</span>
+               <span class="reply-quote-text">${escapeHtml((c.reply_content || '').slice(0, 100))}</span>
+             </div>`
+          : '';
+
+        const deleteBtn = c.is_mine
+          ? `<button class="note-action note-delete" data-id="${c.id}">删除</button>`
+          : '';
+
+        return `
+          <div class="note-card" data-id="${c.id}">
+            <div class="note-head">
+              ${avatarHtml(c.qq)}
+              <span class="note-name">${escapeHtml(c.nickname)}</span>
+              <span class="note-time">${formatTime(c.created_at)}</span>
+            </div>
+            ${replyBlock}
+            <p class="note-text">${escapeHtml(c.content)}</p>
+            <div class="note-actions">
+              <button class="note-action note-vote note-up${upActive}" data-id="${c.id}" data-vote="1">
+                👍 <span>${c.upvotes}</span>
+              </button>
+              <button class="note-action note-vote note-down${downActive}" data-id="${c.id}" data-vote="-1">
+                👎 <span>${c.downvotes}</span>
+              </button>
+              <button class="note-action note-reply-btn" data-id="${c.id}" data-name="${escapeHtml(c.nickname)}">回复</button>
+              ${deleteBtn}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    /* ---------- API 调用 ---------- */
+    async function loadComments() {
+      try {
+        const res = await fetch(`${API}/api/comments`);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        renderComments(await res.json());
+      } catch (err) {
+        list.innerHTML = `<p class="repo-error">加载失败：${escapeHtml(err.message)}</p>`;
+      }
+    }
+
+    async function submitComment(e) {
+      e.preventDefault();
+      const nickname = document.getElementById('nickname').value.trim();
+      const qq = document.getElementById('qq').value.trim();
+      const content = document.getElementById('content').value.trim();
+
+      if (!nickname || !content) {
+        showHint('昵称和内容不能为空', false); return;
+      }
+      if (qq && !/^\d{5,12}$/.test(qq)) {
+        showHint('QQ 号必须是 5-12 位数字', false); return;
       }
 
-      /* 向 Giscus iframe 发送主题变更消息 */
-      function sendThemeToGiscus(theme) {
-        const iframe = document.querySelector('iframe.giscus-frame');
-        if (!iframe || !iframe.contentWindow) return;
+      submitBtn.disabled = true;
+      showHint('正在提交…', null);
 
-        iframe.contentWindow.postMessage(
-          { giscus: { setConfig: { theme: theme } } },
-          'https://giscus.app'
-        );
+      try {
+        const res = await fetch(`${API}/api/comments`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nickname, qq: qq || null, content, reply_to: replyTo })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || '提交失败');
+
+        showHint('留言成功！', true);
+        form.reset();
+        cancelReply();
+        loadComments();
+      } catch (err) {
+        showHint(err.message, false);
+      } finally {
+        submitBtn.disabled = false;
       }
+    }
 
-      /* 监听网站主题变化：点击主题按钮后，同步 Giscus */
-      const observer = new MutationObserver(() => {
-        sendThemeToGiscus(currentGiscusTheme());
-      });
-      observer.observe(document.documentElement, {
-        attributes: true,
-        attributeFilter: ['data-theme']
-      });
+    function showHint(text, ok) {
+      hint.textContent = text;
+      hint.style.color = ok === true ? '#16a34a' : ok === false ? '#ef4444' : '';
+    }
 
-      /* Giscus iframe 加载完成后，主动同步一次初始主题 */
-      window.addEventListener('message', (e) => {
-        if (e.origin !== 'https://giscus.app') return;
-        if (!e.data || !e.data.giscus) return;
-        // 收到 Giscus 的 ready 信号后再发主题
-        sendThemeToGiscus(currentGiscusTheme());
-      });
-    })();
+    function startReply(id, name) {
+      replyTo = id;
+      replyName.textContent = name;
+      replyHint.hidden = false;
+      document.getElementById('content').focus();
+    }
+
+    function cancelReply() {
+      replyTo = null;
+      replyHint.hidden = true;
+      replyName.textContent = '';
+    }
+
+    async function deleteComment(id) {
+      if (!confirm('确定要删除这条留言吗？')) return;
+      try {
+        const res = await fetch(`${API}/api/comments/${id}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || '删除失败');
+        loadComments();
+      } catch (err) {
+        alert('删除失败：' + err.message);
+      }
+    }
+
+    async function voteComment(id, vote) {
+      try {
+        const res = await fetch(`${API}/api/comments/${id}/vote`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ vote })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || '投票失败');
+
+        const card = list.querySelector(`.note-card[data-id="${id}"]`);
+        if (!card) return;
+        const upBtn = card.querySelector('.note-up');
+        const downBtn = card.querySelector('.note-down');
+        upBtn.querySelector('span').textContent = data.upvotes;
+        downBtn.querySelector('span').textContent = data.downvotes;
+        upBtn.classList.toggle('is-active', data.my_vote === 1);
+        downBtn.classList.toggle('is-active', data.my_vote === -1);
+      } catch (err) {
+        alert('投票失败：' + err.message);
+      }
+    }
+
+    /* ---------- 事件委托 ---------- */
+    list.addEventListener('click', (e) => {
+      const voteBtn = e.target.closest('.note-vote');
+      if (voteBtn) {
+        voteComment(voteBtn.dataset.id, Number(voteBtn.dataset.vote));
+        return;
+      }
+      const replyBtn = e.target.closest('.note-reply-btn');
+      if (replyBtn) {
+        startReply(Number(replyBtn.dataset.id), replyBtn.dataset.name);
+        return;
+      }
+      const delBtn = e.target.closest('.note-delete');
+      if (delBtn) {
+        deleteComment(Number(delBtn.dataset.id));
+      }
+    });
+
+    document.getElementById('replyCancel').addEventListener('click', cancelReply);
+    form.addEventListener('submit', submitComment);
+
+    loadComments();
+  })();
   </script>
 </body>
 </html>
