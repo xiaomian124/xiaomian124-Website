@@ -886,6 +886,11 @@ body.theme-transition *::after {
   background: var(--accent-soft);
   border-radius: 8px;
 }
+
+.reply-hint[hidden] {
+  display: none !important;
+}
+
 .reply-hint strong { color: var(--accent); }
 .reply-cancel {
   margin-left: auto;

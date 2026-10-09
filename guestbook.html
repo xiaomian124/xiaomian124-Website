@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>留言 · 一只猫</title>
+  <title>一只猫 · 留言</title>
   <script>
     (function () {
       try {
@@ -128,14 +128,15 @@
       return `${y}-${m}-${d}`;
     }
 
-    // 默认用户图标（无 QQ 时用）
-    const USER_ICON = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
+    // 默认用户图标
+    const USER_ICON = 'assets/user.svg';
 
     function avatarHtml(qq) {
-      if (qq) {
-        return `<img class="note-avatar-img" src="https://q2.qlogo.cn/headimg_dl?dst_uin=${encodeURIComponent(qq)}&spec=100" alt="" onerror="this.outerHTML='<span class=&quot;note-avatar-icon&quot;>${USER_ICON}</span>'">`;
-      }
-      return `<span class="note-avatar-icon">${USER_ICON}</span>`;
+      const src = qq
+        ? `https://q2.qlogo.cn/headimg_dl?dst_uin=${encodeURIComponent(qq)}&spec=100`
+        : USER_ICON;
+      return `<img class="note-avatar-img" src="${src}" alt=""
+               onerror="this.onerror=null;this.src='${USER_ICON}'">`;
     }
 
     /* ---------- 渲染 ---------- */
