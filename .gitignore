@@ -8,3 +8,7 @@ Thumbs.db
 
 *.log
 npm-debug.log*
+
+guestbook-api/node_modules/
+guestbook-api/.wrangler/
+guestbook-api/.dev.vars
