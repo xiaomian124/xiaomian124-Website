@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>一只猫 · 留言</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.8/dist/purify.min.js"></script>
   <script>
     (function () {
       try {
@@ -59,13 +61,55 @@
 
         <div class="form-row">
           <input class="form-input" type="text" id="nickname"
-                 placeholder="昵称（必填）" maxlength="20" required>
+                 placeholder="昵称" maxlength="20" required>
           <input class="form-input" type="text" id="qq"
-                 placeholder="QQ 号（可选，用于头像）" maxlength="12">
+                 placeholder="QQ（可选，用于头像）" maxlength="12">
         </div>
 
-        <textarea class="form-textarea" id="content" rows="4"
-                  placeholder="想说的话（最多 500 字）" maxlength="500" required></textarea>
+        <div class="md-editor">
+          <div class="md-toolbar">
+            <button type="button" class="md-btn" data-md="h" title="标题">H</button>
+            <button type="button" class="md-btn" data-md="b" title="粗体"><b>B</b></button>
+            <button type="button" class="md-btn" data-md="i" title="斜体"><i>I</i></button>
+            <button type="button" class="md-btn" data-md="s" title="删除线"><s>I</s></button>
+            <button type="button" class="md-btn" data-md="code" title="代码">&lt;&gt;</button>
+            <button type="button" class="md-btn md-btn-link" data-md="link" title="链接">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+              </svg>
+            </button>
+
+            <button type="button" class="md-btn md-btn-preview" id="previewToggle" title="预览">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <span class="md-btn-preview-text">预览</span>
+            </button>
+
+            <span class="md-tip">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="4" width="20" height="16" rx="2"/>
+                <path d="m6 8 4 4-4 4"/>
+                <path d="M12 16h6"/>
+              </svg>
+              留言板支持 Markdown 格式
+            </span>
+          </div>
+
+          <textarea class="form-textarea" id="content" rows="6"
+                    placeholder="留言内容（最多 1000 字，支持 Markdown）"
+                    maxlength="1000" required></textarea>
+
+          <div class="md-preview" id="previewArea" hidden>
+            <p class="md-preview-empty" id="previewEmpty">这里还没有内容！</p>
+            <div class="md-content" id="previewContent"></div>
+          </div>
+        </div>
 
         <div class="form-actions">
           <button class="btn btn-primary" type="submit" id="submitBtn">提交留言</button>
@@ -128,7 +172,21 @@
       return `${y}-${m}-${d}`;
     }
 
-    // 默认用户图标
+    /* ---------- Markdown 渲染 ---------- */
+    function renderMarkdown(text) {
+      if (!text) return '';
+      const html = marked.parse(text, { breaks: true, gfm: true });
+      return DOMPurify.sanitize(html, {
+        ALLOWED_TAGS: [
+          'p', 'br', 'strong', 'em', 'del', 'code', 'pre',
+          'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+          'ul', 'ol', 'li', 'blockquote', 'hr'
+        ],
+        ALLOWED_ATTR: ['href', 'target', 'rel']
+      });
+    }
+
+    /* ---------- 头像 ---------- */
     const USER_ICON = 'assets/user.svg';
 
     function avatarHtml(qq) {
@@ -136,10 +194,10 @@
         ? `https://q2.qlogo.cn/headimg_dl?dst_uin=${encodeURIComponent(qq)}&spec=100`
         : USER_ICON;
       return `<img class="note-avatar-img" src="${src}" alt=""
-               onerror="this.onerror=null;this.src='${USER_ICON}'">`;
+              onerror="this.onerror=null;this.src='${USER_ICON}'">`;
     }
 
-    /* ---------- 渲染 ---------- */
+    /* ---------- 渲染留言列表 ---------- */
     function renderComments(comments) {
       if (!comments.length) {
         list.innerHTML = '<p class="repo-empty">还没有留言，快来抢沙发吧！</p>';
@@ -154,9 +212,9 @@
 
         const replyBlock = c.reply_nickname
           ? `<div class="reply-quote">
-               <span class="reply-quote-name">@${escapeHtml(c.reply_nickname)}</span>
-               <span class="reply-quote-text">${escapeHtml((c.reply_content || '').slice(0, 100))}</span>
-             </div>`
+              <span class="reply-quote-name">@${escapeHtml(c.reply_nickname)}</span>
+              <span class="reply-quote-text">${escapeHtml((c.reply_content || '').slice(0, 100))}</span>
+            </div>`
           : '';
 
         const deleteBtn = c.is_mine
@@ -171,13 +229,15 @@
               <span class="note-time">${formatTime(c.created_at)}</span>
             </div>
             ${replyBlock}
-            <p class="note-text">${escapeHtml(c.content)}</p>
+            <div class="note-text md-content">${renderMarkdown(c.content)}</div>
             <div class="note-actions">
               <button class="note-action note-vote note-up${upActive}" data-id="${c.id}" data-vote="1">
-                👍 <span>${c.upvotes}</span>
+                <span class="note-vote-icon note-vote-icon-up"></span>
+                <span>${c.upvotes}</span>
               </button>
               <button class="note-action note-vote note-down${downActive}" data-id="${c.id}" data-vote="-1">
-                👎 <span>${c.downvotes}</span>
+                <span class="note-vote-icon note-vote-icon-down"></span>
+                <span>${c.downvotes}</span>
               </button>
               <button class="note-action note-reply-btn" data-id="${c.id}" data-name="${escapeHtml(c.nickname)}">回复</button>
               ${deleteBtn}
@@ -187,7 +247,7 @@
       }).join('');
     }
 
-    /* ---------- API 调用 ---------- */
+    /* ---------- API ---------- */
     async function loadComments() {
       try {
         const res = await fetch(`${API}/api/comments`);
@@ -210,6 +270,9 @@
       if (qq && !/^\d{5,12}$/.test(qq)) {
         showHint('QQ 号必须是 5-12 位数字', false); return;
       }
+      if (content.length > 1000) {
+        showHint('留言内容不能超过 1000 字', false); return;
+      }
 
       submitBtn.disabled = true;
       showHint('正在提交…', null);
@@ -225,12 +288,13 @@
 
         showHint('留言成功！', true);
         form.reset();
+        updateSubmitState();
         cancelReply();
         loadComments();
       } catch (err) {
         showHint(err.message, false);
       } finally {
-        submitBtn.disabled = false;
+        updateSubmitState();
       }
     }
 
@@ -278,14 +342,67 @@
         if (!card) return;
         const upBtn = card.querySelector('.note-up');
         const downBtn = card.querySelector('.note-down');
-        upBtn.querySelector('span').textContent = data.upvotes;
-        downBtn.querySelector('span').textContent = data.downvotes;
+        upBtn.querySelector('span:last-child').textContent = data.upvotes;
+        downBtn.querySelector('span:last-child').textContent = data.downvotes;
         upBtn.classList.toggle('is-active', data.my_vote === 1);
         downBtn.classList.toggle('is-active', data.my_vote === -1);
       } catch (err) {
         alert('投票失败：' + err.message);
       }
     }
+
+    /* ---------- Markdown 工具栏 ---------- */
+    function insertMarkdown(type) {
+      const ta = document.getElementById('content');
+      const start = ta.selectionStart;
+      const end = ta.selectionEnd;
+      const selected = ta.value.slice(start, end);
+      const before = ta.value.slice(0, start);
+      const after = ta.value.slice(end);
+
+      let insert = '';
+      let cursor = 0;
+
+      switch (type) {
+        case 'h':
+          insert = '## ' + (selected || '标题');
+          cursor = insert.length;
+          break;
+        case 'b':
+          insert = '**' + (selected || '粗体') + '**';
+          cursor = selected ? insert.length : 2;
+          break;
+        case 'i':
+          insert = '*' + (selected || '斜体') + '*';
+          cursor = selected ? insert.length : 1;
+          break;
+        case 's':
+          insert = '~~' + (selected || '删除线') + '~~';
+          cursor = selected ? insert.length : 2;
+          break;
+        case 'code':
+          if (selected.includes('\n')) {
+            insert = '```\n' + selected + '\n```';
+            cursor = insert.length;
+          } else {
+            insert = '`' + (selected || '代码') + '`';
+            cursor = selected ? insert.length : 1;
+          }
+          break;
+        case 'link':
+          insert = '[' + (selected || '链接文字') + '](https://)';
+          cursor = selected ? insert.length - 9 : insert.length - 9;
+          break;
+      }
+
+      ta.value = before + insert + after;
+      ta.focus();
+      ta.setSelectionRange(start + cursor, start + cursor);
+    }
+
+    document.querySelectorAll('.md-btn').forEach(btn => {
+      btn.addEventListener('click', () => insertMarkdown(btn.dataset.md));
+    });
 
     /* ---------- 事件委托 ---------- */
     list.addEventListener('click', (e) => {
@@ -307,6 +424,62 @@
 
     document.getElementById('replyCancel').addEventListener('click', cancelReply);
     form.addEventListener('submit', submitComment);
+
+    const contentEl = document.getElementById('content');
+    const nicknameEl = document.getElementById('nickname');
+
+    function updateSubmitState() {
+      const hasContent = contentEl.value.trim().length > 0;
+      const hasNickname = nicknameEl.value.trim().length > 0;
+      submitBtn.disabled = !(hasContent && hasNickname);
+    }
+
+    contentEl.addEventListener('input', updateSubmitState);
+    nicknameEl.addEventListener('input', updateSubmitState);
+    updateSubmitState();
+
+    /* ---------- Markdown 预览 ---------- */
+    (function initPreview() {
+      const toggle = document.getElementById('previewToggle');
+      const previewArea = document.getElementById('previewArea');
+      const previewContent = document.getElementById('previewContent');
+      const previewEmpty = document.getElementById('previewEmpty');
+      const contentEl = document.getElementById('content');
+      const btnText = toggle.querySelector('.md-btn-preview-text');
+
+      let previewing = false;
+
+      function showPreview() {
+        const text = contentEl.value.trim();
+        if (text) {
+          previewContent.innerHTML = renderMarkdown(text);
+          previewContent.hidden = false;
+          previewEmpty.hidden = true;
+        } else {
+          previewContent.innerHTML = '';
+          previewContent.hidden = true;
+          previewEmpty.hidden = false;
+        }
+        contentEl.hidden = true;
+        previewArea.hidden = false;
+        btnText.textContent = '编辑';
+        toggle.classList.add('is-active');
+        previewing = true;
+      }
+
+      function hidePreview() {
+        contentEl.hidden = false;
+        previewArea.hidden = true;
+        btnText.textContent = '预览';
+        toggle.classList.remove('is-active');
+        previewing = false;
+        contentEl.focus();
+      }
+
+      toggle.addEventListener('click', () => {
+        previewing ? hidePreview() : showPreview();
+      });
+    })();
 
     loadComments();
   })();

@@ -64,10 +64,12 @@ const BAD_WORDS: string[] = [
 ]
 
 function checkSensitive(content: string): string | null {
+  const stripped = content.replace(/\[[^\]]*\]\([^)]*\)/g, '')
+
   for (const p of SENSITIVE_PATTERNS) {
-    if (p.re.test(content)) return p.name
+    if (p.re.test(stripped)) return p.name
   }
-  const lower = content.toLowerCase()
+  const lower = stripped.toLowerCase()
   for (const w of BAD_WORDS) {
     if (lower.includes(w.toLowerCase())) return w
   }
@@ -136,8 +138,8 @@ app.post('/api/comments', async (c) => {
   if (nickname.length > 20) {
     return c.json({ error: '昵称不能超过 20 个字' }, 400)
   }
-  if (content.length > 500) {
-    return c.json({ error: '留言内容不能超过 500 字' }, 400)
+  if (content.length > 1000) {
+    return c.json({ error: '留言内容不能超过 1000 字' }, 400)
   }
   if (qq && !/^\d{5,12}$/.test(qq)) {
     return c.json({ error: 'QQ 号必须是 5-12 位数字' }, 400)
