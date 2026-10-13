@@ -9,22 +9,97 @@
   if (el) el.textContent = new Date().getFullYear();
 })();
 
-/* ---------- 2. 主题切换 ---------- */
+/* ---------- 2. 主题设置菜单 ---------- */
 (function () {
-  const btn = document.querySelector('.theme-toggle');
-  if (!btn) return;
+  const html = document.documentElement;
+  const wrap = document.querySelector('.theme-menu-wrap');
+  const toggle = document.querySelector('.theme-toggle');
+  const menu = document.querySelector('.theme-menu');
+  if (!wrap || !toggle || !menu) return;
 
-  btn.addEventListener('click', () => {
-    const root = document.documentElement;
-    const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  const themeItems = menu.querySelectorAll('[data-theme-option]');
+  const bgItems = menu.querySelectorAll('[data-bg-option]');
 
-    // 切换瞬间开启全局过渡，结束后移除，避免平时影响性能
+  function updateMenuState() {
+    const pref = html.getAttribute('data-theme-pref') || 'auto';
+    const bg = localStorage.getItem('bg') === 'off' ? 'off' : 'on';
+    themeItems.forEach(item => {
+      item.classList.toggle('is-selected', item.dataset.themeOption === pref);
+    });
+    bgItems.forEach(item => {
+      item.classList.toggle('is-selected', item.dataset.bgOption === bg);
+    });
+  }
+
+  function applyTheme(pref) {
+    html.setAttribute('data-theme-pref', pref);
+    try { localStorage.setItem('theme', pref); } catch (e) {}
+
     document.body.classList.add('theme-transition');
 
-    root.setAttribute('data-theme', next);
-    try { localStorage.setItem('theme', next); } catch (e) {}
+    const isDark = pref === 'dark'
+      || (pref === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
+    html.setAttribute('data-theme', isDark ? 'dark' : 'light');
 
     setTimeout(() => document.body.classList.remove('theme-transition'), 420);
+    updateMenuState();
+  }
+
+  function applyBg(opt) {
+    if (opt === 'off') {
+      try { localStorage.setItem('bg', 'off'); } catch (e) {}
+      html.setAttribute('data-bg', 'off');
+      html.style.removeProperty('--bing-bg');
+    } else {
+      try { localStorage.setItem('bg', 'on'); } catch (e) {}
+      html.setAttribute('data-bg', 'on');
+      html.style.setProperty(
+        '--bing-bg',
+        'url("https://guestbook.xiaomian124.top/api/bing")'
+      );
+    }
+    updateMenuState();
+  }
+
+  function openMenu() {
+    menu.removeAttribute('hidden');
+    wrap.classList.add('is-open');
+    updateMenuState();
+  }
+  function closeMenu() {
+    menu.setAttribute('hidden', '');
+    wrap.classList.remove('is-open');
+  }
+
+  toggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    menu.hasAttribute('hidden') ? openMenu() : closeMenu();
+  });
+
+  themeItems.forEach(item => {
+    item.addEventListener('click', () => {
+      applyTheme(item.dataset.themeOption);
+      closeMenu();
+    });
+  });
+
+  bgItems.forEach(item => {
+    item.addEventListener('click', () => {
+      applyBg(item.dataset.bgOption);
+      closeMenu();
+    });
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!wrap.contains(e.target)) closeMenu();
+  });
+
+  // 监听系统主题变化
+  const media = matchMedia('(prefers-color-scheme: dark)');
+  media.addEventListener('change', () => {
+    if (html.getAttribute('data-theme-pref') === 'auto') {
+      html.setAttribute('data-theme', media.matches ? 'dark' : 'light');
+    }
   });
 })();
 
