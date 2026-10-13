@@ -231,4 +231,44 @@ app.post('/api/comments/:id/vote', async (c) => {
   return c.json(stats)
 })
 
+// Bing 每日jpg图像接口，使用 Cloudflare 缓存
+app.get('/api/bing', async (c) => {
+  // 用 Cloudflare 缓存，同一张图只回源一次
+  const cache = caches.default
+  const cacheKey = new Request('https://cache.internal/bing-daily')
+  let cached = await cache.match(cacheKey)
+  if (cached) return cached
+
+  try {
+    const metaRes = await fetch(
+      'https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=zh-CN',
+      { headers: { 'User-Agent': 'Mozilla/5.0' } }
+    )
+    if (!metaRes.ok) throw new Error('meta ' + metaRes.status)
+
+    type BingResponse = {
+      images: Array<{ urlbase: string }>
+    }
+    const data = (await metaRes.json()) as BingResponse
+    const imgUrl = 'https://www.bing.com' + data.images[0].urlbase + '_1920x1080.jpg'
+
+    const imgRes = await fetch(imgUrl)
+    if (!imgRes.ok) throw new Error('img ' + imgRes.status)
+
+    const response = new Response(imgRes.body, {
+      headers: {
+        'Content-Type': 'image/jpeg',
+        'Cache-Control': 'public, max-age=14400',  // 浏览器缓存 4h
+      }
+    })
+
+    // 写入 Cloudflare 边缘缓存
+    c.executionCtx.waitUntil(cache.put(cacheKey, response.clone()))
+
+    return response
+  } catch (e: any) {
+    return c.json({ error: 'Bing 聚焦获取失败：' + e.message }, 500)
+  }
+})
+
 export default app

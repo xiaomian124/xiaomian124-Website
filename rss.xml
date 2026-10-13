@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>一只猫</title>
+    <link>https://xiaomian124.top/</link>
+    <description>个人博客、文档、留言等。</description>
+    <language>zh-CN</language>
+    <atom:link href="https://xiaomian124.top/rss.xml" rel="self" type="application/rss+xml"/>
+
+    <item>
+      <title>页面更新</title>
+      <link>https://xiaomian124.top/about.html</link>
+      <guid>https://xiaomian124.top/about.html</guid>
+      <pubDate>Oct, 13, 2026, 16:55 GMT</pubDate>
+      <description>增加了 Bing 聚焦图背景、卡片半透明效果以及增加了关于页面。</description>
+    </item>
+
+    <item>
+      <title>留言板更新</title>
+      <link>https://xiaomian124.top/guestbook.html</link>
+      <guid>https://xiaomian124.top/guestbook.html</guid>
+      <pubDate>Oct, 10, 2026, 16:55 GMT</pubDate>
+      <description>留言板支持 Markdown 和 Markdown 预览。</description>
+    </item>
+
+    <item>
+      <title>留言板更新</title>
+      <link>https://xiaomian124.top/guestbook.html</link>
+      <guid>https://xiaomian124.top/guestbook.html</guid>
+      <pubDate>Oct, 9, 2026, 17:49 GMT</pubDate>
+      <description>留言板改用 D1 数据库，支持引用回复、投票和 QQ 头像。</description>
+    </item>
+
+  </channel>
+</rss>
