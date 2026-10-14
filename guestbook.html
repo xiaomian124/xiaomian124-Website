@@ -44,6 +44,7 @@
         <a href="https://docs.xiaomian124.top/">文档</a>
         <a href="share.html">分享</a>
         <a href="guestbook.html" class="is-active">留言</a>
+        <a href="friends.html">好友</a>
         <a href="about.html">关于</a>
       </nav>
       <div class="theme-menu-wrap">
@@ -89,8 +90,8 @@
 
   <main class="container">
     <div class="page-head">
-      <h1 class="page-title">留言板</h1>
-      <p class="page-sub">插件建议、项目建议、报告 BUG 或者只是路过打个招呼，都欢迎。</p>
+      <h1 class="page-title">留言</h1>
+      <p class="page-sub">插件建议、项目建议、报告 BUG 或者只是路过打个招呼，都欢迎</p>
     </div>
 
     <section class="panel">
@@ -164,11 +165,20 @@
     <section class="panel">
       <div class="section-title">
         <span>全部留言</span>
+        <div class="comment-search">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.3-4.3"/>
+          </svg>
+          <input type="text" id="commentSearch" placeholder="搜索留言…" autocomplete="off">
+        </div>
         <span class="plugin-count" id="commentCount"></span>
       </div>
       <div class="note-list" id="commentsList">
         <p class="repo-loading">正在加载留言…</p>
       </div>
+      <p class="comment-search-empty" id="commentSearchEmpty" hidden>没有找到匹配的留言。</p>
     </section>
   </main>
 
@@ -193,6 +203,7 @@
     const replyName = replyHint.querySelector('.reply-target-name');
 
     let replyTo = null;
+    let allComments = [];
 
     /* ---------- 工具 ---------- */
     function escapeHtml(str) {
@@ -295,9 +306,35 @@
       try {
         const res = await fetch(`${API}/api/comments`);
         if (!res.ok) throw new Error('HTTP ' + res.status);
-        renderComments(await res.json());
+        allComments = await res.json();
+        applySearch();
       } catch (err) {
         list.innerHTML = `<p class="repo-error">加载失败：${escapeHtml(err.message)}</p>`;
+      }
+    }
+
+    function applySearch() {
+      const q = (searchInput.value || '').trim().toLowerCase();
+      let filtered = allComments;
+
+      if (q) {
+        filtered = allComments.filter(c => {
+          const name = (c.nickname || '').toLowerCase();
+          const content = (c.content || '').toLowerCase();
+          return name.includes(q) || content.includes(q);
+        });
+      }
+
+      renderComments(filtered);
+
+      // 更新空状态
+      const emptyEl = document.getElementById('commentSearchEmpty');
+      if (q && filtered.length === 0) {
+        emptyEl.hidden = false;
+        list.innerHTML = '';
+        countEl.textContent = '';
+      } else {
+        emptyEl.hidden = true;
       }
     }
 
@@ -523,6 +560,10 @@
         previewing ? hidePreview() : showPreview();
       });
     })();
+
+  const searchInput = document.getElementById('commentSearch');
+
+  searchInput.addEventListener('input', applySearch);
 
     loadComments();
   })();

@@ -43,6 +43,7 @@
         <a href="https://docs.xiaomian124.top/">文档</a>
         <a href="share.html">分享</a>
         <a href="guestbook.html">留言</a>
+        <a href="friends.html">好友</a>
         <a href="about.html">关于</a>
       </nav>
       <div class="theme-menu-wrap">
@@ -97,6 +98,7 @@
           <h1>一只猫</h1>
           <span class="handle-tag">@A Cat</span>
           <span class="handle-tag">@xiaomian124</span>
+          <span class="handle-tag">@mian</span>
         </div>
         <p class="bio">Minecraft 玩家 · 插件开发者、模组开发者、服务器创建者、网页设计者等。</p>
         <div class="meta">
@@ -108,6 +110,24 @@
           <span>Minecraft</span>
           <span>...</span>
         </div>
+      </div>
+    </section>
+
+    <!-- ============ 搜索卡片 ============ -->
+    <section class="panel panel-search">
+      <div class="search-card">
+        <p class="search-card-hint" id="searchHint"></p>
+        <div class="search-card-input-wrap">
+          <svg class="search-card-icon" viewBox="0 0 24 24" width="18" height="18" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.3-4.3"/>
+          </svg>
+          <input type="text" id="siteSearch" class="search-card-input"
+                 placeholder="搜索页面、文档，或直接搜索…" autocomplete="off">
+          <kbd class="search-card-kbd">Enter</kbd>
+        </div>
+        <div class="search-dropdown" id="searchDropdown" hidden></div>
       </div>
     </section>
 
@@ -197,5 +217,218 @@
   <script src="js/main.js"></script>
   <script src="js/github-repos.js"></script>
   <script>GitHubRepos.mount('#featuredRepos', 3);</script>
+  <script>
+  (function () {
+    const SEARCH_INDEX = [
+      { title: '首页',       url: '/',                    desc: '个人主页', keywords: 'home 主页 index 一只猫 Acat xiaomian124 mian 网站' },
+      { title: '项目',       url: '/projects.html',       desc: 'GitHub 项目列表', keywords: 'projects github repo 仓库 项目 开发 开源' },
+      { title: '文档',       url: 'https://docs.xiaomian124.top/', desc: '插件与模组使用文档', keywords: 'docs wiki 文档 教程 步骤' },
+      { title: '分享',       url: '/share.html',          desc: '工具和参考资料', keywords: 'share 分享 资源 工具' },
+      { title: '留言板',     url: '/guestbook.html',      desc: '留言与讨论', keywords: 'guestbook 留言 评论 留言板 讨论 探讨 帖子 贴' },
+      { title: '好友',       url: '/friends.html',        desc: '开发者好友', keywords: 'friends 好友 友链 开发者' },
+      { title: '关于',       url: '/about.html',          desc: '联系方式与隐私政策', keywords: 'about 关于 联系 隐私 保护 政策 贡献 奉献 赞助 赞赏 链接 网站 信息 rss RSS 联系 联络 支持 开源 资源' },
+
+      { title: 'Alcohol',     url: 'https://docs.xiaomian124.top/plugins/alcohol/',     desc: '服务器酿酒插件', keywords: 'alcohol 酿酒 物品 配方 服务器' },
+      { title: 'MoonCake',    url: 'https://docs.xiaomian124.top/plugins/mooncake/',    desc: '中秋节主题插件', keywords: 'mooncake 中秋 物品 月饼 服务器' },
+      { title: 'NationalDay', url: 'https://docs.xiaomian124.top/plugins/nationalday/', desc: '国庆节主题插件', keywords: 'nationalday 国庆 物品 礼包 服务器' },
+      { title: 'RedPacket2',  url: 'https://docs.xiaomian124.top/plugins/redpacket/',   desc: '支持数据库的红包插件', keywords: 'redpacket 红包 经济 服务器 金币' },
+      { title: 'XCreeper',    url: 'https://docs.xiaomian124.top/plugins/xcreeper/',    desc: '苦力怕征求同意再爆炸', keywords: 'xcreeper 苦力怕 爬行者 creeper 服务器' },
+      { title: 'SafeWorld',   url: 'https://docs.xiaomian124.top/plugins/safeworld/',   desc: '创造服综合安全防护插件', keywords: 'safeworld safe 创造 服务器 安全 防护 保护' },
+      { title: 'A Better Foods',   url: 'https://docs.xiaomian124.top/plugins/betterfoods/', desc: '食物拓展模组', keywords: 'foods 食物 物品 休闲 模组 烹饪 mod mods' },
+    ];
+
+      const ENGINES = {
+        bing:   { name: 'Bing',   url: 'https://www.bing.com/search?q=', icon: '/assets/icons/bing.svg' },
+        google: { name: 'Google', url: 'https://www.google.com/search?q=', icon: '/assets/icons/google.svg' },
+        baidu:  { name: '百度',   url: 'https://www.baidu.com/s?wd=',     icon: '/assets/icons/baidu.svg' },
+      };
+
+    const DEFAULT_ENGINE = 'bing';
+
+    const input = document.getElementById('siteSearch');
+    const dropdown = document.getElementById('searchDropdown');
+    if (!input || !dropdown) return;
+
+    let activeIndex = -1;
+    let currentResults = [];
+
+    function searchSite(q) {
+      if (!q) return [];
+      const lower = q.toLowerCase();
+      const scored = [];
+      for (const item of SEARCH_INDEX) {
+        const haystack = (item.title + ' ' + item.desc + ' ' + item.keywords).toLowerCase();
+        if (haystack.includes(lower)) {
+          const priority = item.title.toLowerCase().includes(lower) ? 0 : 1;
+          scored.push({ item, priority });
+        }
+      }
+      scored.sort((a, b) => a.priority - b.priority);
+      return scored.slice(0, 6).map(s => s.item);
+    }
+
+    function renderDropdown(q) {
+      const results = searchSite(q);
+      currentResults = results;
+
+      let html = '';
+
+      if (results.length) {
+        html += '<div class="search-dropdown-group">';
+        html += '<span class="search-dropdown-label">站内</span>';
+        results.forEach((item, i) => {
+          html += `<a class="search-dropdown-item" href="${item.url}" data-index="${i}">
+            <span class="search-dropdown-icon">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </span>
+            <span class="search-dropdown-body">
+              <span class="search-dropdown-title">${item.title}</span>
+              <span class="search-dropdown-desc">${item.desc}</span>
+            </span>
+          </a>`;
+        });
+        html += '</div>';
+      }
+
+      if (q) {
+        html += '<div class="search-dropdown-group">';
+        html += '<span class="search-dropdown-label">用搜索引擎</span>';
+        for (const [key, engine] of Object.entries(ENGINES)) {
+          html += `<a class="search-dropdown-item search-dropdown-engine" 
+                      href="${engine.url}${encodeURIComponent(q)}" 
+                      target="_blank" rel="noopener">
+            <span class="search-dropdown-icon search-dropdown-icon-engine" 
+                  style="--icon: url('${engine.icon}')"></span>
+            <span class="search-dropdown-body">
+              <span class="search-dropdown-title">在 ${engine.name} 搜索「${escapeHtml(q)}」</span>
+            </span>
+          </a>`;
+        }
+        html += '</div>';
+      }
+
+      if (!results.length && !q) {
+        dropdown.hidden = true;
+        return;
+      }
+
+      dropdown.innerHTML = html;
+      dropdown.hidden = false;
+      activeIndex = -1;
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function closeDropdown() {
+      dropdown.hidden = true;
+      activeIndex = -1;
+    }
+
+    input.addEventListener('input', () => {
+      renderDropdown(input.value.trim());
+    });
+
+    input.addEventListener('focus', () => {
+      if (input.value.trim()) renderDropdown(input.value.trim());
+    });
+
+    input.addEventListener('keydown', (e) => {
+      const items = dropdown.querySelectorAll('.search-dropdown-item');
+
+      if (e.key === 'Escape') {
+        closeDropdown();
+        input.blur();
+        return;
+      }
+
+      if (e.key === 'ArrowDown' && items.length) {
+        e.preventDefault();
+        activeIndex = (activeIndex + 1) % items.length;
+        updateActive(items);
+        return;
+      }
+
+      if (e.key === 'ArrowUp' && items.length) {
+        e.preventDefault();
+        activeIndex = activeIndex <= 0 ? items.length - 1 : activeIndex - 1;
+        updateActive(items);
+        return;
+      }
+
+      if (e.key === 'Enter') {
+        e.preventDefault();
+
+        if (activeIndex >= 0 && items[activeIndex]) {
+          items[activeIndex].click();
+          return;
+        }
+
+        if (currentResults.length) {
+          window.location.href = currentResults[0].url;
+          return;
+        }
+
+        const q = input.value.trim();
+        if (q) {
+          window.open(ENGINES[DEFAULT_ENGINE].url + encodeURIComponent(q), '_blank');
+        }
+      }
+    });
+
+    function updateActive(items) {
+      items.forEach((item, i) => {
+        item.classList.toggle('is-active', i === activeIndex);
+        if (i === activeIndex) item.scrollIntoView({ block: 'nearest' });
+      });
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.search-card')) closeDropdown();
+    });
+
+    dropdown.addEventListener('click', () => {
+      closeDropdown();
+    });
+
+    /* ---------- 搜索提示语 ---------- */
+    (function () {
+      const hints = [
+        '想从哪里开始？',
+        '今天想干点什么？',
+        '想查点什么？',
+        '有什么新鲜事？',
+        '找不到东西了？',
+        '随便看看？',
+        '有什么想找的？',
+        '想了解我的项目吗？',
+        '想了解我的文档吗？',
+        '想查阅些什么？',
+        '想找点资源吗？',
+        '今天想学点什么？',
+        '想找点灵感吗？',
+        '想找点好玩的东西吗？',
+        '想找点有趣的东西吗？',
+        '今天感觉如何？',
+        '想找点什么？',
+        '想找点有用的东西吗？',
+        '在寻思些什么？',
+        '有什么困惑？',
+        '有什么要做的事？',
+        '尝试搜索些什么？',
+        '打算干点啥？',
+        '有什么不懂的？',
+        '试试能搜索出什么？',
+        '搜索下看看？'
+      ];
+      const el = document.getElementById('searchHint');
+      if (!el) return;
+      el.textContent = hints[Math.floor(Math.random() * hints.length)];
+    })();
+  })();
+  </script>
 </body>
 </html>
