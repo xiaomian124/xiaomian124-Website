@@ -8,6 +8,14 @@
     <atom:link href="https://xiaomian124.top/rss.xml" rel="self" type="application/rss+xml"/>
 
     <item>
+      <title>新增好友页面</title>
+      <link>https://xiaomian124.top/friends.html</link>
+      <guid>https://xiaomian124.top/friends.html</guid>
+      <pubDate>Oct, 14, 2026, 17:58 GMT</pubDate>
+      <description>增加了好友页面，以及支持链接和隐私政策，还增加了首页搜索功能等。</description>
+    </item>
+
+    <item>
       <title>页面更新</title>
       <link>https://xiaomian124.top/about.html</link>
       <guid>https://xiaomian124.top/about.html</guid>

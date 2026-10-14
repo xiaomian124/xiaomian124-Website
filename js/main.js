@@ -1,7 +1,19 @@
 /* =========================================================
    main.js —— 全站共用逻辑
-   包含：页脚年份、主题切换、导航滚动状态、滚动揭示
+   包含：页脚年份、主题切换、导航滚动状态、滚动揭示等
    ========================================================= */
+
+/* ---------- 禁止恢复滚动位置 ---------- */
+(function () {
+  if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+  }
+  window.addEventListener('load', () => {
+    if (!location.hash) {
+      window.scrollTo(0, 0);
+    }
+  });
+})();
 
 /* ---------- 1. 页脚年份 ---------- */
 (function () {
@@ -94,7 +106,6 @@
     if (!wrap.contains(e.target)) closeMenu();
   });
 
-  // 监听系统主题变化
   const media = matchMedia('(prefers-color-scheme: dark)');
   media.addEventListener('change', () => {
     if (html.getAttribute('data-theme-pref') === 'auto') {
@@ -143,4 +154,53 @@
   });
 
   items.forEach(el => io.observe(el));
+})();
+
+/* ---------- 隐私政策更新提示 ---------- */
+(function () {
+  const PRIVACY_VERSION = '2026-10-14';
+  const STORAGE_KEY = 'privacy_seen_version';
+
+  let seen = null;
+  try { seen = localStorage.getItem(STORAGE_KEY); } catch (e) {}
+  if (seen === PRIVACY_VERSION) return;
+
+  const nav = document.querySelector('.site-nav');
+  if (!nav) return;
+
+  const bar = document.createElement('div');
+  bar.className = 'privacy-banner';
+  bar.innerHTML = `
+    <div class="privacy-banner-inner">
+      <span class="privacy-banner-icon">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      </span>
+      <span class="privacy-banner-text">
+        我们在 <strong>${PRIVACY_VERSION}</strong> 更新了隐私政策
+      </span>
+      <a class="privacy-banner-btn privacy-banner-view" href="/about.html#privacy">查看</a>
+      <button class="privacy-banner-btn privacy-banner-dismiss" type="button">了解</button>
+    </div>
+  `;
+
+  nav.parentNode.insertBefore(bar, nav.nextSibling);
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => bar.classList.add('is-visible'));
+  });
+
+  bar.querySelector('.privacy-banner-dismiss').addEventListener('click', () => {
+    try { localStorage.setItem(STORAGE_KEY, PRIVACY_VERSION); } catch (e) {}
+    bar.classList.remove('is-visible');
+    setTimeout(() => bar.remove(), 500);
+  });
+
+  bar.querySelector('.privacy-banner-view').addEventListener('click', () => {
+    try { localStorage.setItem(STORAGE_KEY, PRIVACY_VERSION); } catch (e) {}
+  });
 })();
