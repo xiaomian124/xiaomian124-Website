@@ -424,9 +424,23 @@
         '试试能搜索出什么？',
         '搜索下看看？'
       ];
+
+      function getGreeting() {
+        const h = new Date().getHours();
+        if (h >= 0 && h < 6)   return '夜已深';
+        if (h >= 6 && h < 12)  return '上午好';
+        if (h >= 12 && h < 14) return '中午好';
+        if (h >= 14 && h < 18) return '下午好';
+        if (h >= 18 && h < 22) return '晚上好';
+        return '夜深了';
+      }
+
       const el = document.getElementById('searchHint');
       if (!el) return;
-      el.textContent = hints[Math.floor(Math.random() * hints.length)];
+
+      const greeting = getGreeting();
+      const hint = hints[Math.floor(Math.random() * hints.length)];
+      el.textContent = greeting + '，' + hint;
     })();
   })();
   </script>
